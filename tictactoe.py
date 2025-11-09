@@ -1,88 +1,72 @@
-from turtle import *      # Імпортуємо все з модуля turtle для малювання графіки
-from random import randint # Імпортуємо функцію randint для випадкового вибору гравця
+from turtle import*
+from random import randint
 
-# === Налаштування ===
-speed(0)                  # Встановлюємо максимально швидку анімацію черепахи
-size = 100                # Розмір клітинки поля
-playing_field = [None, -1, -1, -1, -1, -1, -1, -1, -1, -1]  
-# Масив для збереження стану клітинок: -1 = вільна, 0 = нулик, 1 = хрестик
-# Індекс 0 не використовується для зручності нумерації клітинок від 1 до 9
-
-# координати верхнього лівого кута клітинок (для малювання)
+speed(0)
+size = 100
+playing_field = [None, -1, -1, -1, -1, -1, -1, -1, -1, -1] 
 x_cor = [None, -100, 0, 100, -100, 0, 100, -100, 0, 100]
 y_cor = [None, 100, 100, 100, 0, 0, 0, -100, -100, -100]
-
-# === Допоміжні функції ===
 def start(x, y):
-    """Переміщає курсор без малювання у вказану позицію"""
-    penup()   # Піднімаємо перо, щоб не малювати
-    goto(x, y) # Переміщаємо черепаху в координати (x, y)
-    pendown()  # Опускаємо перо, щоб почати малювати
+    penup()
+    goto(x, y)
+    pendown()
 
 def field(col):
-    """Малює ігрове поле 3x3"""
-    xStart, yStart = -100, 100  # Верхній лівий кут сітки
-
+    xStart, yStart = -100, 100
     x, y = xStart, yStart
-    color(col)    # Встановлюємо колір ліній
-    width(10)     # Встановлюємо товщину ліній
-    for i in range(3):      # Рядки
-        for j in range(3):  # Стовпчики
-            start(x, y)     # Переміщаємося у верхній лівий кут клітинки
-            for _ in range(4):  # Малюємо квадрат
-                forward(size)
-                right(90)
-            x += size      # Переходимо до наступної клітинки по горизонталі
-        x = xStart          # Повертаємося до початку рядка
-        y -= size           # Переходимо до наступного рядка
-
+    color(col)
+    width(10)
+    for i in range(3):
+        for j in range(3):
+            start(x, y)
+            for d in range(4):
+                fd(size)
+                rt(90)
+            x += size
+        x = xStart
+        y -= size
 def draw_cross(x, y, col):
-    """Малює хрестик у центрі клітинки"""
-    cx = x + size // 2  # Обчислюємо центр клітинки по X
-    cy = y - size // 2  # Обчислюємо центр клітинки по Y
-    color(col)          # Встановлюємо колір
-    width(10)           # Товщина ліній
-
-    # Перша діагональ
+    cx = x + size // 2
+    cy = y - size // 2
+    color(col)
+    width(10)
+    #перша діагональ
     penup()
-    goto(cx - 0.5*size, cy - 0.5*size) # Початок діагоналі
+    goto(cx - 0.5*size, cy - 0.5*size)
     pendown()
-    goto(cx + 0.5*size, cy + 0.5*size) # Кінець діагоналі
-
-    # Друга діагональ
+    goto(cx + 0.5*size, cy + 0.5*size)
+    
+    #друга діагональ
     penup()
     goto(cx - 0.5*size, cy + 0.5*size)
     pendown()
     goto(cx + 0.5*size, cy - 0.5*size)
     penup()
-    setheading(0)  # Повертаємо напрямок черепахи на 0 градусів
+    setheading(0)
 
 def draw_dot(x, y, col):
-    """Малює нулик у центрі клітинки"""
-    cx = x + size // 2  # Центр клітинки по X
-    cy = y - size // 2  # Центр клітинки по Y
+    cx = x + size // 2
+    cy = y - size // 2
     penup()
-    goto(cx, cy - size // 2)  # Позиціюємо черепаху так, щоб circle малював від краю
+    goto(cx, cy-size //2)
     pendown()
     color(col)
     width(5)
-    circle(size // 2)   # Малюємо коло (нулик)
+    circle(size//2)
     penup()
     setheading(0)
 
 def move_player(player, col):
-    """Обробляє хід гравця"""
-    cell = int(input("Введіть номер клітинки (1-9): "))  # Вводимо номер клітинки
-    while playing_field[cell] != -1:  # Перевірка, чи клітинка вільна
-        print("Клітинка вже зайнята! Оберіть іншу.")
+    cell = int(input("Введіть номер клітинки (1-9): "))
+    while playing_field[cell] != -1:
+        print("Клітинка вже занята, оберіть іншу!")
         cell = int(input("Введіть номер клітинки (1-9): "))
-
-    x, y = x_cor[cell], y_cor[cell]   # Отримуємо координати клітинки
-    playing_field[cell] = player      # Записуємо хід гравця в масив
+    x, y, = x_cor[cell], y_cor[cell]
+    playing_field[cell] = player
     if player == 1:
-        draw_cross(x, y, col)  # Малюємо хрестик
+        draw_cross(x, y, col)
     else:
-        draw_dot(x, y, col)    # Малюємо нулик
+        draw_dot(x, y, col)
     return -1
 
 def check_win():
@@ -96,7 +80,6 @@ def check_win():
         if playing_field[a] == playing_field[b] == playing_field[c] and playing_field[a] != -1:
             return playing_field[a], cell, h  # Повертаємо гравця, клітинку та кут для перемоги
     return -1, 0, 0  # Ніхто не виграв
-
 def crossOut(cell, h, who):
     """Малює лінію перемоги через центр клітинок"""
     x, y = x_cor[cell], y_cor[cell]
@@ -130,8 +113,6 @@ def crossOut(cell, h, who):
 def check_no_one_won():
     """Перевіряє, чи залишились вільні клітинки"""
     return -1 not in playing_field  # Якщо -1 немає, всі клітинки зайняті
-
-# === Основна логіка гри ===
 field("black")               # Малюємо ігрове поле чорного кольору
 player = randint(0, 1)       # Випадково обираємо, хто ходить перший (0 або 1)
 
@@ -156,3 +137,5 @@ while True:
         break
 
 done()  # Завершуємо роботу черепахи і зберігаємо вікно
+
+
