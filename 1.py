@@ -1,7 +1,11 @@
 from turtle import*
 from random import randint
 
+speed(0)
 size = 100
+playing_field = [None, -1, -1, -1, -1, -1, -1, -1, -1, -1] 
+x_cor = [None, -100, 0, 100, -100, 0, 100, -100, 0, 100]
+y_cor = [None, 100, 100, 100, 0, 0, 0, -100, -100, -100]
 def start(x, y):
     penup()
     goto(x, y)
@@ -21,7 +25,6 @@ def field(col):
             x += size
         x = xStart
         y -= size
-
 def draw_cross(x, y, col):
     cx = x + size // 2
     cy = y - size // 2
@@ -77,7 +80,62 @@ def check_win():
         if playing_field[a] == playing_field[b] == playing_field[c] and playing_field[a] != -1:
             return playing_field[a], cell, h  # Повертаємо гравця, клітинку та кут для перемоги
     return -1, 0, 0  # Ніхто не виграв
+def crossOut(cell, h, who):
+    """Малює лінію перемоги через центр клітинок"""
+    x, y = x_cor[cell], y_cor[cell]
+    cx = x + size // 2  # Центр клітинки по X
+    cy = y - size // 2  # Центр клітинки по Y
 
+    color("green")
+    width(7)
+    
+    if h == 0:  # Горизонтальна лінія
+        penup()
+        goto(cx - 1.5*size, cy)
+        pendown()
+        goto(cx + 1.5*size, cy)
+    elif h == 270:  # Вертикальна лінія
+        penup()
+        goto(cx, cy + 1.5*size)
+        pendown()
+        goto(cx, cy - 1.5*size)
+    else:  # Діагоналі
+        penup()
+        goto(cx - 1.5*size, cy - 1.5*size)
+        pendown()
+        goto(cx + 1.5*size, cy + 1.5*size)
 
+    penup()
+    goto(0, 0)
+    write(f"Виграв: {who}", align="center", font=("Arial", 20, "bold"))
+    setheading(0)
+
+def check_no_one_won():
+    """Перевіряє, чи залишились вільні клітинки"""
+    return -1 not in playing_field  # Якщо -1 немає, всі клітинки зайняті
+field("black")               # Малюємо ігрове поле чорного кольору
+player = randint(0, 1)       # Випадково обираємо, хто ходить перший (0 або 1)
+
+while True:
+    if player == 1:
+        move_player(player, "red")   # Хід хрестика
+        player = 0
+    else:
+        move_player(player, "blue")  # Хід нулика
+        player = 1
+
+    win, cell, h = check_win()  # Перевіряємо переможця
+    if win == 1:
+        crossOut(cell, h, "Хрестик")  # Малюємо лінію перемоги
+        break
+    elif win == 0:
+        crossOut(cell, h, "Нулик")    # Малюємо лінію перемоги
+        break
+
+    if check_no_one_won():            # Якщо всі клітинки зайняті
+        write("Нічия!", font=("Arial", 20, "bold"))
+        break
+
+done()  # Завершуємо роботу черепахи і зберігаємо вікно
 
 
